@@ -18,7 +18,9 @@ jobs:
     - name: Decode Google Services
       env:
         FIREBASE_CONFIG: ${{ secrets.FIREBASE_ANDROID }}
-      run: echo $FIREBASE_ANDROID > app/google-services.json
+      run: |
+        touch android/app/google-services.json
+        echo $FIREBASE_ANDROID > android/app/google-services.json
 
     - run: flutter pub get
       
