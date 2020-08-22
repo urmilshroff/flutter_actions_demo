@@ -1,32 +1,36 @@
-name: GH Action for automated build
+name: Main Workflow
 on: [pull_request, push]
 
 jobs:
   build:
-    name: Build for Android
+    name: Build APK for Android
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-java@v1
+    - name: Clone repo
+      uses: actions/checkout@v2
+    
+    - name: Install Java
+      uses: actions/setup-java@v1
       with:
         java-version: '12.x'
-    - uses: subosito/flutter-action@v1
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v1
       with:
         channel: 'stable' # or: 'dev' or 'beta'
           
     - name: Decode Google Services
       env:
-        FIREBASE_CONFIG: ${{ secrets.FIREBASE_ANDROID }}
+        FIREBASE_ANDROID: ${{ secrets.FIREBASE_ANDROID }}
       run: |
         touch android/app/google-services.json
         echo $FIREBASE_ANDROID > android/app/google-services.json
-        cat android/app/google-services.json
-
-    - run: flutter pub get
       
     - name: Build APK
-      run: flutter build apk
+      run: |
+        flutter pub get
+        flutter build apk
 
 #     - name: Test
 #       run: flutter test test/widget_test.dart
