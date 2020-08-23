@@ -39,5 +39,6 @@ jobs:
 
     - name: Build iOS
       run: |
+        pod init && pod install
         flutter pub get
         flutter build ios --release --no-codesign
