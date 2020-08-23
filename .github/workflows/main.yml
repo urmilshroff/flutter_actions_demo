@@ -3,34 +3,38 @@ on: [push, pull_request_target]
 
 jobs:
   build:
-    name: Build APK for Android
+    name: Build for Android & iOS
     runs-on: macos-latest
-    
+
     steps:
-    - name: Clone repo
+    - name: Clone repository
       uses: actions/checkout@v2
-    
-    - name: Install Java
+
+    - name: Setup Java
       uses: actions/setup-java@v1
       with:
-        java-version: '12.x'
-    
+        java-version: '14.x'
+
     - name: Setup Flutter
       uses: subosito/flutter-action@v1
-      with:
-        channel: 'stable' # or: 'dev' or 'beta'
-          
+
     - name: Decode Google Services
-      env:
-        FIREBASE_ANDROID: ${{ secrets.FIREBASE_ANDROID }}
+      env: |
+        FIREBASE_ANDROID: ${{ secrets.FIREBASE_ANDROID }} # GitHub Secrets
+        FIREBASE_IOS: ${{ secrets.FIREBASE_IOS }}
       run: |
-        touch android/app/google-services.json
-        echo $FIREBASE_ANDROID > android/app/google-services.json
-      
+        touch android/app/google-services.json # creates an empty file
+        echo $FIREBASE_ANDROID > android/app/google-services.json # writes secret data to empty file
+
+        touch ios/GoogleService-Info.plist
+        echo $FIREBASE_IOS > ios/GoogleService-Info.plist
+
     - name: Build APK
       run: |
         flutter pub get
         flutter build apk
 
-#     - name: Test
-#       run: flutter test test/widget_test.dart
+    - name: Build iOS
+      run: |
+        flutter pub get
+        flutter build ios --no-codesign
