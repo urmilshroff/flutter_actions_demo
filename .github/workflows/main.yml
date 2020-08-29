@@ -1,46 +1,29 @@
-name: Main Workflow
+name: Build
 on: [push, pull_request]
 
 jobs:
   build:
-    name: Build for Android & iOS
+    name: Build for Android
     runs-on: macos-latest
-
+    
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-
+      
     - name: Setup Java
       uses: actions/setup-java@v1
       with:
         java-version: '12.x'
-
+        
     - name: Setup Flutter
       uses: subosito/flutter-action@v1
-
-    - name: Decode Google Services for Android
+      
+    - name: Decode Google Services
       env:
         FIREBASE_ANDROID: ${{ secrets.FIREBASE_ANDROID }} # GitHub Secrets variable
       run: |
         touch android/app/google-services.json # creates an empty file
         echo $FIREBASE_ANDROID > android/app/google-services.json # writes secret data to empty file
-
-    - name: Decode Google Services for iOS
-      env:
-        FIREBASE_IOS: ${{ secrets.FIREBASE_IOS }}
-      run: |
-        touch ios/GoogleService-Info.plist
-        echo $FIREBASE_IOS > ios/GoogleService-Info.plist
-
-    - name: Build APK
-      run: |
-        flutter pub get
-        flutter build apk
-
-    - name: Build iOS
-      run: |
-        cd ios/
-        pod init && pod install
-        cd ..
-        flutter pub get
-        flutter build ios --release --no-codesign
+      
+    - name: Build debug APK
+      run: flutter build apk --debug
